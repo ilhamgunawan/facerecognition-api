@@ -1,6 +1,19 @@
 const express = require('express');
 const cors = require('cors');
+const knex = require('knex');
 const app = express();
+
+const postgres = knex({
+    client: 'pg',
+    connection: {
+      host : '127.0.0.1',
+      user : 'admin',
+      password : '159357',
+      database : 'face-recognition-db'
+    }
+});
+
+console.log(postgres.select('*').from('users'));
 
 app.use(express.json());
 app.use(cors());
