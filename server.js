@@ -18,39 +18,25 @@ const db = knex({
 app.use(express.json());
 app.use(cors());
 
-const database = {
-    users: [
-        {
-            id: '1',
-            name: 'John',
-            email: 'john@email.com',
-            password: '12345',
-            entries: 0,
-            joined: new Date()
-        },
-        {
-            id: '2',
-            name: 'Jane',
-            email: 'jane@email.com',
-            password: '54321',
-            entries: 0,
-            joined: new Date()
-        }
-    ]
-}
-
-
 app.get('/', (req, res) => {
     res.json(database.users);
 });
 
 app.post('/signin', (req, res) => {
-    if (req.body.email === database.users[0].email
-    && req.body.password === database.users[0].password) {
-        res.json(database.users[0]);
-    } else {
-        res.status(400).json('sign in fail');
-    }
+    const { email, password } = req.body;
+    db.select('email', 'hash').from('login')
+        .where('email', '=', email)
+        .then(data => {
+            const isValid = bcrypt.compareSync(password, data[0].hash);
+            if (isValid) {
+                return db.select('*').from('users')
+                    .where('email', '=', email)
+                    .then(user => res.json(user[0]));
+            } else {
+                res.status(400).json('Wrong credentials.');
+            }
+        })
+        .catch(err => res.status(400).json('Wrong credentials.'));
 });
 
 app.post('/register', (req, res) => {
