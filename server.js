@@ -3,7 +3,7 @@ const cors = require('cors');
 const knex = require('knex');
 const app = express();
 
-const postgres = knex({
+const db = knex({
     client: 'pg',
     connection: {
       host : '127.0.0.1',
@@ -12,8 +12,6 @@ const postgres = knex({
       database : 'face-recognition-db'
     }
 });
-
-console.log(postgres.select('*').from('users'));
 
 app.use(express.json());
 app.use(cors());
@@ -55,17 +53,15 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const { email, password, name } = req.body;
-    database.users.push(
-        {
-            id: '3',
-            name: name,
+    db('users')
+        .returning('*')
+        .insert({
             email: email,
-            password: password,
-            entries: 0,
+            name: name,
             joined: new Date()
-        }
-    );
-    res.json(database.users[database.users.length-1]);
+        })
+        .then(user => res.json(user[0]))
+        .catch(err => res.status(400).json('Unable to Sign Up'));
 });
 
 app.get('/profile/:id', (req, res) => {
