@@ -80,17 +80,11 @@ app.get('/profile/:id', (req, res) => {
 
 app.put('/image', (req, res) => {
     const { id } = req.body;
-    let userFound = false;
-    database.users.forEach(user => {
-        if(user.id === id) {
-            userFound = true;
-            user.entries++;
-            return res.json(user.entries);
-        }
-    });
-    if (!userFound) {
-        res.status(404).json('no such user');
-    }
-})
+    db('users').where('id', '=', id)
+        .increment('entries', 1)
+        .returning('entries')
+        .then(entries => res.json(entries))
+        .catch(err => res.status(400).json('Unable to get user entires.'));
+});
 
 app.listen(3030, () => console.log('app is running on port 3030'));
