@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt-nodejs');
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
-
+const image = require('./controllers/image');
 const app = express();
 
 // initialize database
@@ -34,13 +34,7 @@ app.post('/register', (req, res) => register.handleRegister(req, res, db, bcrypt
 // profile endpoint
 app.get('/profile/:id', (req, res) => profile.handleProfile(req, res, db));
 
-app.put('/image', (req, res) => {
-    const { id } = req.body;
-    db('users').where('id', '=', id)
-        .increment('entries', 1)
-        .returning('entries')
-        .then(entries => res.json(entries))
-        .catch(err => res.status(400).json('Unable to get user entires.'));
-});
+// image endpoint
+app.put('/image', (req, res) => image.handleImage(req, res, db));
 
 app.listen(3030, () => console.log('app is running on port 3030'));
