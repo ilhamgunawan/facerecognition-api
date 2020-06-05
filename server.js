@@ -4,9 +4,11 @@ const knex = require('knex');
 const bcrypt = require('bcrypt-nodejs');
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
+const profile = require('./controllers/profile');
 
 const app = express();
 
+// initialize database
 const db = knex({
     client: 'pg',
     connection: {
@@ -20,27 +22,17 @@ const db = knex({
 app.use(express.json());
 app.use(cors());
 
-app.get('/', (req, res) => {
-    res.json(database.users);
-});
+// root endpoint
+app.get('/', (req, res) => res.json(database.users));
 
+// signin endpoint
 app.post('/signin', (req, res) => signin.handleSignin(req, res, db, bcrypt));
 
+// register endpoint
 app.post('/register', (req, res) => register.handleRegister(req, res, db, bcrypt));
 
-app.get('/profile/:id', (req, res) => {
-    const { id } = req.params;
-    db.select()
-        .from('users')
-        .where({id: id})
-        .then(user => {
-            if (user.length) {
-                res.json(user[0]);
-            } else {
-                res.status(400).json('No Such User');
-            }
-        });
-});
+// profile endpoint
+app.get('/profile/:id', (req, res) => profile.handleProfile(req, res, db));
 
 app.put('/image', (req, res) => {
     const { id } = req.body;
