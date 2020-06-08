@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(cors());
 
 // root endpoint
-app.get('/', (req, res) => res.json(database.users));
+app.get('/', (req, res) => res.send(status(200), 'Ok'));
 
 // signin endpoint
 app.post('/signin', (req, res) => signin.handleSignin(req, res, db, bcrypt));
