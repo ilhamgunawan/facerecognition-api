@@ -37,4 +37,4 @@ app.get('/profile/:id', (req, res) => profile.handleProfile(req, res, db));
 // image endpoint
 app.put('/image', (req, res) => image.handleImage(req, res, db));
 
-app.listen(3030, () => console.log('app is running on port 3030'));
+app.listen(process.env.PORT || 3030, () => console.log(`app is running on port ${process.env.PORT}`));
